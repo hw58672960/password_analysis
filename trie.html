@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JS判断拼音密码强度</title>
+    <style>
+        .D-color {
+            background: #eeeeee;
+        }
+    
+        .L-color {
+            background: #FF0000;
+        }
+        
+        .M-color {
+            background: #FF9900;
+        }
+        
+        .H-color {
+            background: #33CC00;
+        }
+    </style>
+    <script language=javascript>
+        var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+        function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+        var TrieNode = function TrieNode() {
+            _classCallCheck(this, TrieNode);
+
+            this.son = [];
+            this.isValue = false;
+            this.val = null;
+        };
+
+        var Trie = (function () {
+            function Trie() {
+                _classCallCheck(this, Trie);
+
+                this.root = new TrieNode();
+            }
+
+            _createClass(Trie, [{
+                key: "insert",
+                value: function insert(str) {
+                    if (typeof str !== "string" || str.length == 0) return;
+                    str = str.toLowerCase();
+                    var node = this.root;
+                    var letters = str.split("");
+                    for (var i = 0, len = str.length; i < len; i++) {
+                        var pos = letters[i].charCodeAt(0) - " ".charCodeAt(0);
+                        if (node.son[pos] == null) {
+                            node.son[pos] = new TrieNode();
+                            node.son[pos].val = letters[i];
+                        }
+                        node = node.son[pos];
+                    }
+                    node.isValue = true;
+                }
+            }, {
+                key: "contain",
+                value: function contain(str, pos) {
+                    var node = this.root;
+                    var old = pos;
+                    while (pos < str.length && node != null) {
+                        var ch = str.charAt(pos);
+                        var temp = ch.charCodeAt(0) - ' '.charCodeAt(0);
+                        node = node.son[temp];
+                        ++pos;
+                        if (node == null) {
+                            node = this.root;
+                            pos = ++old;
+                            continue;
+                        }
+                        if (node.isValue) break;
+                    }
+                    return pos;
+                }
+            }]);
+
+            return Trie;
+        })();
+
+        function main(pwd) {
+
+            var trie = new Trie();
+            var pinyin = ["a", "ai", "an", "ao", "ba", "bai", "ban", "bang", "bao", "bei", "ben", "beng", "bi", "bian", "biao", "bie", "bin", "bing", "bo", "bu", "ca", "cai", "can", "cang", "cao", "ce", "cen", "ceng", "cha", "chai", "chan", "chang", "chao", "che", "chen", "cheng", "chi", "chong", "chou", "chu", "chuai", "chuan", "chuang", "chui", "chun", "chuo", "ci", "cong", "cou", "cu", "cuan", "cui", "cun", "cuo", "da", "dai", "dan", "dang", "dao", "de", "dei", "deng", "di", "dia", "dian", "diao", "die", "ding", "diu", "dong", "dou", "du", "duan", "dui", "dun", "duo", "e", "en", "eng", "er", "fa", "fan", "fang", "fei", "fen", "feng", "fo", "fou", "fu", "ga", "gai", "gan", "gang", "gao", "ge", "gei", "gen", "geng", "gong", "gou", "gu", "gua", "guai", "guan", "guang", "gui", "gun", "guo", "ha", "hai", "han", "hang", "hao", "he", "hei", "hen", "heng", "hong", "hou", "hu", "hua", "huai", "huan", "huang", "hui", "hun", "huo", "ji", "jia", "jian", "jiang", "jiao", "jie", "jin", "jing", "jiong", "jiu", "ju", "juan", "jue", "ka", "kai", "kan", "kang", "kao", "ke", "ken", "keng", "kong", "kou", "ku", "kua", "kuai", "kuan", "kuang", "kui", "kun", "kuo", "la", "lai", "lan", "lang", "lao", "le", "lei", "leng", "li", "lia", "lian", "liang", "liao", "lie", "lin", "ling", "liu", "lo", "long", "lou", "lu", "luan", "lun", "luo", "lv", "lue", "ma", "mai", "man", "mang", "mao", "me", "mei", "men", "meng", "mi", "mian", "miao", "mie", "min", "ming", "miu", "mo", "mou", "mu", "na", "nai", "nan", "nang", "nao", "ne", "nei", "nen", "neng", "ni", "nian", "niang", "niao", "nie", "nin", "ning", "niu", "nong", "nou", "nu", "nuan", "nuo", "nv", "nue", "o", "ou", "pa", "pai", "pan", "pang", "pao", "pei", "pen", "peng", "pi", "pian", "piao", "pie", "pin", "ping", "po", "pou", "pu", "qi", "qia", "qian", "qiang", "qiao", "qie", "qin", "qing", "qiong", "qiu", "qu", "quan", "que", "qun", "ran", "rang", "rao", "re", "ren", "reng", "ri", "rong", "rou", "ru", "rua", "ruan", "rui", "run", "ruo", "sa", "sai", "san", "sang", "sao", "se", "sen", "seng", "sha", "shai", "shan", "shang", "shao", "she", "shen", "sheng", "shi", "shou", "shu", "shua", "shuai", "shuan", "shuang", "shui", "shun", "shuo", "si", "song", "sou", "su", "suan", "sui", "sun", "suo", "ta", "tai", "tan", "tang", "tao", "te", "tei", "teng", "ti", "tian", "tiao", "tie", "ting", "tong", "tou", "tu", "tuan", "tui", "tun", "tuo", "wa", "wai", "wan", "wang", "wei", "wen", "weng", "wo", "wu", "xi", "xia", "xian", "xiang", "xiao", "xie", "xin", "xing", "xiong", "xiu", "xu", "xuan", "xue", "xun", "ya", "yan", "yang", "yao", "ye", "yi", "yin", "ying", "yo", "yong", "you", "yu", "yuan", "yue", "yun", "za", "zai", "zan", "zang", "zao", "ze", "zei", "zen", "zeng", "zha", "zhai", "zhan", "zhang", "zhao", "zhe", "zhen", "zheng", "zhi", "zhong", "zhou", "zhu", "zhua", "zhuai", "zhuan", "zhuang", "zhui", "zhun", "zhuo", "zi", "zong", "zou", "zu", "zuan", "zui", "zun", "zuo"];
+            for (var i = 0, len = pinyin.length; i < len; i++) {
+                trie.insert(pinyin[i]);
+            }
+
+            var result = 0;
+            for (var pos = 0; pos < pwd.length;) {
+                pos = trie.contain(pwd, pos);
+                if (pos < pwd.length) {
+                    result++;
+                }
+            }
+            return result;
+        }
+        function pwStrength(pwd) {
+            var Default_color = 'D-color'; //默认颜色
+            var L_color = 'L-color'; //低强度的颜色，且只显示在最左边的单元格中
+            var M_color = 'M-color'; //中等强度的颜色，且只显示在左边两个单元格中
+            var H_color = 'H-color'; //高强度的颜色，三个单元格都显示
+            var Lcolor = undefined,
+                Mcolor = undefined,
+                Hcolor = undefined;
+            if (!pwd) {
+                Lcolor = Mcolor = Hcolor = Default_color;
+            } else {
+                // 是S_level <= A时，显示低强度
+                // A < S_level <= B时，显示中等强度
+                // B < S_level <= C时，显示高强度
+               var S_level = this.main(pwd);
+                if (S_level >= 1 && S_level <= 2) {
+                    Lcolor = L_color;
+                    Mcolor = Hcolor = Default_color;
+                } else if (S_level >= 3 && S_level <= 5) {
+                    Lcolor = Mcolor = M_color;
+                    Hcolor = Default_color;
+                } else if (S_level >= 6) {
+                    Lcolor = Mcolor = Hcolor = H_color;
+                } else {
+                    Lcolor = Mcolor = Hcolor = Default_color;
+                }
+            }
+            document.getElementById("strength_L").className = Lcolor;
+            document.getElementById("strength_M").className = Mcolor;
+            document.getElementById("strength_H").className = Hcolor;
+            return;
+        }
+    </script>
+</head>
+<body>
+<form name=form1 action="">
+    <table width="250" border="0" cellpadding=2" bordercolor="#eeeeee" style='display:inline'>
+        <tr>
+            <td width="40%" align="right">password:</td>
+            <td colspan="3" align="left">
+                <input type=text size=20 onKeyUp=pwStrength(this.value) onBlur=pwStrength(this.value)>
+            </td>
+        </tr>
+        <tr align="center">
+            <td width="40%" align="right">pinyin analysis:</td>
+            <td width="20%" id="strength_L" bgcolor="#eeeeee">low</td>
+            <td width="20%" id="strength_M" bgcolor="#eeeeee">mid</td>
+            <td width="20%" id="strength_H" bgcolor="#eeeeee">strong</td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>
